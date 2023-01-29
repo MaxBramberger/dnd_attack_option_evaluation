@@ -22,7 +22,7 @@ class AttackVsArmorClassHitCalculator(HitCalculator):
 
     def get_attack_did_hit(self) ->bool:
         self._last_result=self._d20.roll()
-        return self._last_result==20 or (self._atk_bonus + self._last_result >= self._armor_class)
+        return (self._last_result==20 or (self._atk_bonus + self._last_result >= self._armor_class)) and not self._last_result==1
 
     def get_last_attack_did_crit(self) ->bool:
         return self._last_result==20

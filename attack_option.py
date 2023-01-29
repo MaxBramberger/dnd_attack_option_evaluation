@@ -2,8 +2,10 @@ from typing import NamedTuple
 
 import numpy as np
 
-from damage_calculator import DamageCalculator
-from hit_calculator import HitCalculator
+from damage_calculator import DamageCalculator, AttackDamageCalculator
+from dice import Die
+from hit_calculator import HitCalculator, AttackVsArmorClassHitCalculator
+
 
 class ScopeAndDistribution(NamedTuple):
     scope: np.ndarray
@@ -23,10 +25,10 @@ class AttackOption:
                 damage+=self._damage_calculator.get_damage(crit=crit)
         return damage
 
-    def get_damage_distribution(self, number_of_samples=100000) -> ScopeAndDistribution:
+    def get_damage_distribution(self, number_of_samples:int=100000) -> ScopeAndDistribution:
         attacks = number_of_samples
         damage = []
-        for n in range(attacks):
+        for _n in range(attacks):
             damage.append(self.attack())
         diff_dmg = sorted(list(set(damage)))
         probabilities = []
@@ -35,3 +37,15 @@ class AttackOption:
 
         return ScopeAndDistribution(np.array(diff_dmg),np.array(probabilities))
 
+
+class EldritchBlast(AttackOption):
+    def __init__(self, attack_bonus: int, armor_class:int, base_damage:int, number_of_attacks: int):
+        hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
+        damage_calculator = AttackDamageCalculator(dice=[Die(10)], base_damage=base_damage)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)
+
+class FireBolt(AttackOption):
+    def __init__(self, attack_bonus: int, armor_class: int, base_damage: int, number_of_dice: int):
+        hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
+        damage_calculator = AttackDamageCalculator(dice=[Die(10) for _n in range(number_of_dice)], base_damage=base_damage)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
