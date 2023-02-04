@@ -16,10 +16,14 @@ def get_interactive_plot_fire_bolt_vs_eldritch_blast(color: str= "red"):
     fig=plt.figure()
     ax=fig.add_subplot(111)
     fig.subplots_adjust(left=0.25,bottom=0.25)
-    line,=ax.plot(scope,distribution,marker="x", linestyle="none",color=color)
-    line2,=ax.plot(scope2,distribution2,marker="x",linestyle="none",color="blue")
+    line,=ax.plot(scope,distribution,marker="x", linestyle="none",color=color, label="Eldritch Blast")
+    line2,=ax.plot(scope2,distribution2,marker="x",linestyle="none",color="blue", label="Fire Bolt")
+    plt.title("Base dmg: 4, AC: 17, number of dice/attacks: 2")
+    plt.ylabel("Probability")
+    plt.xlabel("Damage")
+    plt.legend()
 
-    atk_bonus_slider_ax = fig.add_axes([0.25, 0.15, 0.65, 0.03], facecolor=color)
+    atk_bonus_slider_ax = fig.add_axes([0.25, 0.1, 0.65, 0.03], facecolor=color)
     atk_bonus_slider = Slider(atk_bonus_slider_ax, 'Attack Bonus', 0.0, 19.0, valinit=7, valstep=1.)
 
     def sliders_on_changed(val):
