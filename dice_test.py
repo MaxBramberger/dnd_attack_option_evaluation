@@ -1,7 +1,4 @@
 import numpy as np
-from matplotlib import pyplot as plt
-import pytest
-
 from dice import Die
 
 def test_dice()->None:
