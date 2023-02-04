@@ -4,7 +4,7 @@ import numpy as np
 
 from damage_calculator import DamageCalculator, AttackDamageCalculator
 from dice import Die
-from hit_calculator import HitCalculator, AttackVsArmorClassHitCalculator
+from hit_calculator import HitCalculator, AttackVsArmorClassHitCalculator, AlwaysHitNeverCrit
 
 
 class ScopeAndDistribution(NamedTuple):
@@ -25,7 +25,7 @@ class AttackOption:
                 damage+=self._damage_calculator.get_damage(crit=crit)
         return damage
 
-    def get_damage_distribution(self, number_of_samples:int=100000) -> ScopeAndDistribution:
+    def get_damage_distribution(self, number_of_samples:int=50000) -> ScopeAndDistribution:
         attacks = number_of_samples
         damage = []
         for _n in range(attacks):
@@ -49,3 +49,16 @@ class FireBolt(AttackOption):
         hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
         damage_calculator = AttackDamageCalculator(dice=[Die(10) for _n in range(number_of_dice)], base_damage=base_damage)
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
+
+class ScorchingRay(AttackOption):
+    def __init__(self, attack_bonus: int, armor_class:int, number_of_attacks:int=3):
+        hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
+        damage_calculator = AttackDamageCalculator(dice=[Die(6),Die(6)],
+                                                   base_damage=0)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)
+
+class MagicMissiles(AttackOption):
+    def __init__(self, number_of_attacks: int = 3):
+        hit_calculator=AlwaysHitNeverCrit()
+        damage_calculator=AttackDamageCalculator(dice=[Die(4)], base_damage=1)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)

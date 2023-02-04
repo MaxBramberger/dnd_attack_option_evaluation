@@ -26,3 +26,12 @@ class AttackVsArmorClassHitCalculator(HitCalculator):
 
     def get_last_attack_did_crit(self) ->bool:
         return self._last_result==20
+
+class AlwaysHitNeverCrit(HitCalculator):
+    def __init__(self):
+        pass
+    def get_last_attack_did_crit(self) ->bool:
+        return False
+
+    def get_attack_did_hit(self) ->bool:
+        return True
