@@ -1,5 +1,7 @@
 import numpy as np
-from dice import Die
+
+from backend.dice import Die
+
 
 def test_dice()->None:
     d6=Die(6)

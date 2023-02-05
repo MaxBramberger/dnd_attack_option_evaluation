@@ -2,9 +2,9 @@ from typing import NamedTuple
 
 import numpy as np
 
-from damage_calculator import DamageCalculator, AttackDamageCalculator
-from dice import Die
-from hit_calculator import HitCalculator, AttackVsArmorClassHitCalculator, AlwaysHitNeverCrit
+from backend.damage_calculator import DamageCalculator, AttackDamageCalculator
+from backend.dice import Die
+from backend.hit_calculator import HitCalculator, AttackVsArmorClassHitCalculator, AlwaysHitNeverCrit
 
 
 class ScopeAndDistribution(NamedTuple):

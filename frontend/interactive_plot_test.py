@@ -1,5 +1,5 @@
-from attack_option import EldritchBlast, FireBolt, MagicMissiles, ScorchingRay
-from interactive_plot import get_interactive_plot_fire_bolt_vs_eldritch_blast, get_interactive_plot_from_list
+from backend.attack_option import EldritchBlast, FireBolt, MagicMissiles, ScorchingRay
+from frontend.interactive_plot import get_interactive_plot_fire_bolt_vs_eldritch_blast, get_interactive_plot_from_list
 
 
 def test_interactive_plot()->None:

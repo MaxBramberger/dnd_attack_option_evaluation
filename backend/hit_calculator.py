@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from dice import Die
+from backend.dice import Die
 
 
 class HitCalculator(ABC):

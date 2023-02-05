@@ -1,9 +1,6 @@
 from matplotlib import pyplot as plt
 
-from attack_option import AttackOption, EldritchBlast, FireBolt
-from damage_calculator import AttackDamageCalculator
-from dice import Die
-from hit_calculator import AttackVsArmorClassHitCalculator
+from backend.attack_option import EldritchBlast, FireBolt
 
 
 def test_eldritch_blast() -> None:

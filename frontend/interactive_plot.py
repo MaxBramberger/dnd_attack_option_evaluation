@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider
 
-from attack_option import EldritchBlast, AttackOption, FireBolt
+from backend.attack_option import EldritchBlast, FireBolt, AttackOption
 
 
 def get_interactive_plot_fire_bolt_vs_eldritch_blast(color: str= "red"):
