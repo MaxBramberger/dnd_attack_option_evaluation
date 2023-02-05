@@ -1,4 +1,6 @@
-from frontend.interactive_plot import get_interactive_plot_fire_bolt_vs_eldritch_blast
+from frontend.gui.gui import MainWindow
+import tkinter as tk
 
 if __name__ == "__main__":
-    get_interactive_plot_fire_bolt_vs_eldritch_blast()
+    window = MainWindow()
+    tk.mainloop()
