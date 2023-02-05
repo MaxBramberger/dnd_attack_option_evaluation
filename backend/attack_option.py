@@ -12,6 +12,7 @@ class ScopeAndDistribution(NamedTuple):
     distribution: np.ndarray
 
 class AttackOption:
+    name: str
     def __init__(self, hit_calculator: HitCalculator, damage_calculator: DamageCalculator, number_of_attacks: int =1)->None:
         self._damage_calculator=damage_calculator
         self._hit_calculator=hit_calculator
@@ -39,18 +40,21 @@ class AttackOption:
 
 
 class EldritchBlast(AttackOption):
+    name: str = "Eldritch Blast"
     def __init__(self, attack_bonus: int, armor_class:int, base_damage:int, number_of_attacks: int):
         hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
         damage_calculator = AttackDamageCalculator(dice=[Die(10)], base_damage=base_damage)
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)
 
 class FireBolt(AttackOption):
+    name: str = "Fire Bolt"
     def __init__(self, attack_bonus: int, armor_class: int, base_damage: int, number_of_dice: int):
         hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
         damage_calculator = AttackDamageCalculator(dice=[Die(10) for _n in range(number_of_dice)], base_damage=base_damage)
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
 
 class ScorchingRay(AttackOption):
+    name: str = "Scorching Ray"
     def __init__(self, attack_bonus: int, armor_class:int, number_of_attacks:int=3):
         hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
         damage_calculator = AttackDamageCalculator(dice=[Die(6),Die(6)],
@@ -58,6 +62,7 @@ class ScorchingRay(AttackOption):
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)
 
 class MagicMissiles(AttackOption):
+    name: str = "Magic Missiles"
     def __init__(self, number_of_attacks: int = 3):
         hit_calculator=AlwaysHitNeverCrit()
         damage_calculator=AttackDamageCalculator(dice=[Die(4)], base_damage=1)
