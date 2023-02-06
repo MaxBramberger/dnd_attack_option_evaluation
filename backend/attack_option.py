@@ -55,6 +55,15 @@ class FireBolt(AttackOption):
         damage_calculator = AttackDamageCalculator(dice=[Die(10) for _n in range(CANTRIP_INTEGER_DICT[character_level])], base_damage=base_damage)
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
 
+class GuidingBolt(AttackOption):
+    name: str = "Guiding Bolt"
+    def __init__(self, attack_bonus: int, armor_class: int, base_damage: int, spell_level: int =1):
+        if spell_level < 1:
+            raise ValueError("Guiding Bolt needs to be cast at least on lvl 1.")
+        hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
+        damage_calculator = AttackDamageCalculator(dice=[Die(6) for _n in range(4+spell_level-1)], base_damage=base_damage)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
+
 class ScorchingRay(AttackOption):
     name: str = "Scorching Ray"
     def __init__(self, attack_bonus: int, armor_class:int, spell_level:int=2):
@@ -68,6 +77,8 @@ class ScorchingRay(AttackOption):
 class MagicMissiles(AttackOption):
     name: str = "Magic Missiles"
     def __init__(self, spell_level: int = 1):
+        if spell_level < 1:
+            raise ValueError("Magic Missile needs to be cast at least on lvl 1.")
         hit_calculator=AlwaysHitNeverCrit()
         damage_calculator=AttackDamageCalculator(dice=[Die(4)], base_damage=1)
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=spell_level+2)
@@ -101,4 +112,23 @@ class Fireball(AttackOption):
             damage+=self._damage_calculator.get_damage(crit=False)
             if not self._hit_calculator.get_attack_did_hit():
                 damage=int(damage/2)
+        return damage
+
+class IceKnife(AttackOption):
+    name: str = "Ice Knife"
+    def __init__(self,attack_bonus: int= 5, armor_class: int=12, spell_save_dc: int =13,saving_throw_modifier: int =0,num_secondary_targets: int =0, spell_level: int =1):
+        if spell_level < 1:
+            raise ValueError("Ice Knife needs to be cast at least on lvl 3.")
+        hit_calculator=AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus,armor_class=armor_class)
+        damage_calculator=AttackDamageCalculator([Die(10)],0)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
+        self._num_secondary_targets=num_secondary_targets
+        self._secondary_hit_calculator=SavingThrowHitCalculator(spell_save_dc,saving_throw_modifier)
+        self._secondary_damage_calculator=AttackDamageCalculator([Die(6) for _n in range(2+spell_level-1)],0)
+
+    def attack(self) -> int:
+        damage=super().attack()
+        for _n in range(self._num_secondary_targets+1):
+            if self._secondary_hit_calculator.get_attack_did_hit():
+                damage+=self._secondary_damage_calculator.get_damage(False)
         return damage
