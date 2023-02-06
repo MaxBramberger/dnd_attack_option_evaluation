@@ -82,3 +82,23 @@ class Disintegrate(AttackOption):
         damage_calculator = AttackDamageCalculator(dice=[Die(6) for _n in range(10+3*(spell_level-6))],
                                                    base_damage=40)
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
+
+class Fireball(AttackOption):
+    name: str = "Fireball"
+
+    def __init__(self,num_targets: int =1,spell_save_dc: int = 13, saving_throw_modifier: int =0,spell_level: int =3):
+        if spell_level < 3:
+            raise ValueError("Fireball needs to be cast at least on lvl 3.")
+        hit_calculator = SavingThrowHitCalculator(spell_save_dc, saving_throw_modifier)
+        damage_calculator = AttackDamageCalculator(dice=[Die(6) for _n in range(8 +  (spell_level - 3))],
+                                                   base_damage=0)
+        self._num_targets=num_targets
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
+
+    def attack(self) -> int:
+        damage=0
+        for _n in range(self._num_targets):
+            damage+=self._damage_calculator.get_damage(crit=False)
+            if not self._hit_calculator.get_attack_did_hit():
+                damage=int(damage/2)
+        return damage
