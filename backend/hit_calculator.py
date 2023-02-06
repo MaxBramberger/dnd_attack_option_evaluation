@@ -27,6 +27,21 @@ class AttackVsArmorClassHitCalculator(HitCalculator):
     def get_last_attack_did_crit(self) ->bool:
         return self._last_result==20
 
+class SavingThrowHitCalculator(HitCalculator):
+    def __init__(self, spell_save_dc: int = 13, saving_throw_modifier: int=0)-> None:
+        self._saving_throw_modifier=saving_throw_modifier
+        self._spell_save_dc=spell_save_dc
+        self._d20=Die(20)
+
+    def get_attack_did_hit(self) ->bool:
+        return self._d20.roll()+self._saving_throw_modifier < self._spell_save_dc
+
+    def get_last_attack_did_crit(self) ->bool:
+        return False
+
+
+
+
 class AlwaysHitNeverCrit(HitCalculator):
     def __init__(self):
         pass

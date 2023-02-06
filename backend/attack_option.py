@@ -4,8 +4,10 @@ import numpy as np
 
 from backend.damage_calculator import DamageCalculator, AttackDamageCalculator
 from backend.dice import Die
-from backend.hit_calculator import HitCalculator, AttackVsArmorClassHitCalculator, AlwaysHitNeverCrit
+from backend.hit_calculator import HitCalculator, AttackVsArmorClassHitCalculator, AlwaysHitNeverCrit, \
+    SavingThrowHitCalculator
 
+CANTRIP_INTEGER_DICT={n : 1 if n <5 else 2 if n<11 else 3 if n<17 else 4 for n in range(1,21)}
 
 class ScopeAndDistribution(NamedTuple):
     scope: np.ndarray
@@ -41,29 +43,42 @@ class AttackOption:
 
 class EldritchBlast(AttackOption):
     name: str = "Eldritch Blast"
-    def __init__(self, attack_bonus: int, armor_class:int, base_damage:int, number_of_attacks: int):
+    def __init__(self, attack_bonus: int, armor_class:int, base_damage:int, character_level: int=1):
         hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
         damage_calculator = AttackDamageCalculator(dice=[Die(10)], base_damage=base_damage)
-        super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=CANTRIP_INTEGER_DICT[character_level])
 
 class FireBolt(AttackOption):
     name: str = "Fire Bolt"
-    def __init__(self, attack_bonus: int, armor_class: int, base_damage: int, number_of_dice: int):
+    def __init__(self, attack_bonus: int, armor_class: int, base_damage: int, character_level: int =1):
         hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
-        damage_calculator = AttackDamageCalculator(dice=[Die(10) for _n in range(number_of_dice)], base_damage=base_damage)
+        damage_calculator = AttackDamageCalculator(dice=[Die(10) for _n in range(CANTRIP_INTEGER_DICT[character_level])], base_damage=base_damage)
         super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)
 
 class ScorchingRay(AttackOption):
     name: str = "Scorching Ray"
-    def __init__(self, attack_bonus: int, armor_class:int, number_of_attacks:int=3):
+    def __init__(self, attack_bonus: int, armor_class:int, spell_level:int=2):
+        if spell_level < 2:
+            raise ValueError("Scorching Ray needs to be cast at least on lvl 2.")
         hit_calculator = AttackVsArmorClassHitCalculator(attack_bonus=attack_bonus, armor_class=armor_class)
         damage_calculator = AttackDamageCalculator(dice=[Die(6),Die(6)],
                                                    base_damage=0)
-        super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=spell_level+1)
 
 class MagicMissiles(AttackOption):
     name: str = "Magic Missiles"
-    def __init__(self, number_of_attacks: int = 3):
+    def __init__(self, spell_level: int = 1):
         hit_calculator=AlwaysHitNeverCrit()
         damage_calculator=AttackDamageCalculator(dice=[Die(4)], base_damage=1)
-        super().__init__(hit_calculator, damage_calculator, number_of_attacks=number_of_attacks)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=spell_level+2)
+
+class Disintegrate(AttackOption):
+    name: str = "Disintegrate"
+
+    def __init__(self,spell_save_dc: int = 13, saving_throw_modifier: int =0,spell_level: int =6):
+        if spell_level < 6:
+            raise ValueError("Disintegrate needs to be cast at least on lvl 6.")
+        hit_calculator = SavingThrowHitCalculator(spell_save_dc,saving_throw_modifier)
+        damage_calculator = AttackDamageCalculator(dice=[Die(6) for _n in range(10+3*(spell_level-6))],
+                                                   base_damage=40)
+        super().__init__(hit_calculator, damage_calculator, number_of_attacks=1)

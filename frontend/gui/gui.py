@@ -19,15 +19,17 @@ class FrontEndAttackOption:
         self.label = tk.Label(self.frame, text=attack_option.name)
         self.label.pack(side=tk.LEFT,padx=20)
 
-        params = inspect.signature(attack_option.__init__).parameters
-        params = [param for param in params if param != "self"]
+        params_dict = inspect.signature(attack_option.__init__).parameters
+        params = [param for param in params_dict if param != "self"]
         self.label_frame=tk.Frame(self.frame,width=500)
         self.entry_frame=tk.Frame(self.frame,width=500)
         self.entries = []
         for param in params:
             label = tk.Label(self.label_frame, width=20,text=param)
             entry = tk.Entry(self.entry_frame, width=20)
-            if param in DEFAULT_PARAMS:
+            if type(params_dict[param].default) is int:
+                entry.insert(0,params_dict[param].default)
+            elif param in DEFAULT_PARAMS:
                 entry.insert(0,DEFAULT_PARAMS[param])
             else:
                 entry.insert(0, "0")
