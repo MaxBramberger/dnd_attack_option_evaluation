@@ -4,6 +4,7 @@ from functools import partial
 from typing import Type
 
 import matplotlib
+import numpy as np
 from matplotlib import pyplot as plt
 
 from backend.attack_option import AttackOption
@@ -99,15 +100,23 @@ class MainWindow:
     def plot(self):
         plt.close()
         num_plots=len(self.front_end_attack_options)
+        max_prob=0
         for idx,front_end_attack_option in enumerate(self.front_end_attack_options):
             color_float=idx/num_plots
             attack_option=front_end_attack_option.get_attack_option()
             scope, distribution=attack_option.get_damage_distribution()
+            mean=np.sum(distribution*scope)
+            # std=np.sqrt(np.sum(distribution*scope*scope)-mean*mean)
             distribution*=100
+            if max(distribution)>max_prob:
+                max_prob=max(distribution)
             plt.plot(scope,distribution,color=matplotlib.colormaps["viridis"](color_float),linestyle="none",marker="x", label=attack_option.name)
+            plt.vlines([mean],ymin=0,ymax=100, linestyles="dashed", alpha=0.5, color=matplotlib.colormaps["viridis"](color_float))
+            # plt.fill_between([mean-std,mean+std],y1=0, y2=100, alpha=0.05, color=matplotlib.colormaps["viridis"](color_float))
         plt.legend()
         plt.ylabel("Probability [%]")
         plt.xlabel("Damage")
+        plt.ylim([0,int(1.1*max_prob)])
         plt.show()
 
     def clear(self)->None:
