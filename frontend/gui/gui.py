@@ -78,9 +78,17 @@ class MainWindow:
         clear_button.pack(side=tk.RIGHT)
         buttons_frame.pack()
         self.front_end_attack_options: list[FrontEndAttackOption]=[]
-        plot_button=tk.Button(self.root,text="plot", command=self.plot)
-        plot_button.pack(side=tk.BOTTOM)
 
+        plot_button_frame=tk.Frame(self.root)
+        self.show_mean=tk.IntVar()
+        self.show_std=tk.IntVar()
+        show_mean_switch=tk.Checkbutton(plot_button_frame,text="Show mean",variable=self.show_mean,padx=20)
+        show_mean_switch.pack(side=tk.LEFT)
+        show_std_switch = tk.Checkbutton(plot_button_frame,text="Show std",variable=self.show_std,padx=20)
+        show_std_switch.pack(side=tk.LEFT)
+        plot_button=tk.Button(plot_button_frame,text="plot", command=self.plot)
+        plot_button.pack(side=tk.RIGHT)
+        plot_button_frame.pack(side=tk.BOTTOM)
 
     def add_entry(self):
         value=self.value_inside.get()
@@ -101,18 +109,24 @@ class MainWindow:
         plt.close()
         num_plots=len(self.front_end_attack_options)
         max_prob=0
+        show_std=self.show_std.get()
+        show_mean=self.show_mean.get()
         for idx,front_end_attack_option in enumerate(self.front_end_attack_options):
             color_float=idx/num_plots
             attack_option=front_end_attack_option.get_attack_option()
             scope, distribution=attack_option.get_damage_distribution()
-            mean=np.sum(distribution*scope)
-            # std=np.sqrt(np.sum(distribution*scope*scope)-mean*mean)
+            if show_mean or show_std:
+                mean=np.sum(distribution*scope)
+            if show_std:
+                std=np.sqrt(np.sum(distribution*scope*scope)-mean*mean)
             distribution*=100
             if max(distribution)>max_prob:
                 max_prob=max(distribution)
             plt.plot(scope,distribution,color=matplotlib.colormaps["viridis"](color_float),linestyle="none",marker="x", label=attack_option.name)
-            plt.vlines([mean],ymin=0,ymax=100, linestyles="dashed", alpha=0.5, color=matplotlib.colormaps["viridis"](color_float))
-            # plt.fill_between([mean-std,mean+std],y1=0, y2=100, alpha=0.05, color=matplotlib.colormaps["viridis"](color_float))
+            if show_mean:
+                plt.vlines([mean],ymin=0,ymax=100, linestyles="dashed", alpha=0.5, color=matplotlib.colormaps["viridis"](color_float))
+            if show_std:
+                plt.fill_between([mean-std,mean+std],y1=0, y2=100, alpha=0.05, color=matplotlib.colormaps["viridis"](color_float))
         plt.legend()
         plt.ylabel("Probability [%]")
         plt.xlabel("Damage")
